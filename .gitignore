@@ -1,2 +1,4 @@
 __MACOSX/
 desktop.ini
+.ipynb_checkpoints/
+__pycache__/

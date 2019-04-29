@@ -1,4 +1,7 @@
 
+import pandas as pd
+import numpy as np
+
 _country_indices = {
 	'UK': 0,
 	'FR': 1,
@@ -42,6 +45,10 @@ def preprocess_json_for_pandas(json_to_process):
             json_to_process[i]['user'] = json_to_process[i]['user'][0][0]
         else:
             raise Exception('Data does not follow assumptions: users are multiple')
+        if len(json_to_process[i]['cities']) == 1:
+            json_to_process[i]['cities'] = [city.strip().lower()  for city in json_to_process[i]['cities'][0].split(',')]
+        else:
+            raise Exception('Data does not follow assumptions: cities is a one element array with a comma delimited string of requests')
 
 
 def generate_plot_base():
@@ -56,9 +63,28 @@ def generate_plot_base():
 	ax = fig.add_subplot(111, projection='polar')
 	c = ax.scatter(theta, r, c=colors, s=area, cmap='hsv', alpha=0.75)
 
+def compute_user_origin_matrix(countries_dictionary):
+	keys = list(countries_dictionary.keys())
+	origin_matrix = np.zeros((len(keys), len(keys)))
+	for i in range(len(keys)):
+		for j in range(len(keys)):
+			origin_matrix[i][j] = len(countries_dictionary[keys[i]].unique_users.intersection(countries_dictionary[keys[j]].unique_users))
+	return pd.DataFrame(origin_matrix, index=keys, columns=keys)
+
+
 def get_index_for_country(country):
 	return _country_indices.get(country,-1)
 
 def get_color_for_country(country):
 	return _country_colors.get(country,'#0eece6')
+
+def flatten_list_of_lists(list_of_lists):
+	resulting_set = set()
+	for l in list_of_lists:
+		resulting_set.update(l)
+	return list(resulting_set)
+
+#def predict_from_logproba(sequence, log_proba):
+
+
 

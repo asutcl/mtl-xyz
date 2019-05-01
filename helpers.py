@@ -84,6 +84,17 @@ def flatten_list_of_lists(list_of_lists):
 		resulting_set.update(l)
 	return list(resulting_set)
 
+def to_GMT(row):
+	hour = row['hour_of_day']
+	timezone = row['user.country']
+	if timezone == 'US':
+		return hour + 6
+	if timezone == 'UK':
+		return hour - 12
+	if timezone == '':
+		return hour - 7
+	return hour - 11
+
 #def predict_from_logproba(sequence, log_proba):
 
 

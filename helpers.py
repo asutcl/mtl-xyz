@@ -1,6 +1,7 @@
 
 import pandas as pd
 import numpy as np
+from IPython.display import display_html
 
 _country_indices = {
 	'UK': 0,
@@ -84,18 +85,46 @@ def flatten_list_of_lists(list_of_lists):
 		resulting_set.update(l)
 	return list(resulting_set)
 
-def to_GMT(row):
+def to_normalized_time(row):
+	##
+	# Centers the data about the median in a day and 
+	# translates the median to 0
+	# (target - median + 12) % 24 -12
+	# the medians are copied from the time analysis
 	hour = row['hour_of_day']
 	timezone = row['user.country']
 	if timezone == 'US':
-		return hour + 6
+		return (hour - 18 + 12) % 24 - 12
 	if timezone == 'UK':
-		return hour - 12
-	if timezone == '':
-		return hour - 7
-	return hour - 11
+		return hour % 24 - 12
+	if timezone == '' or timezone == '??':
+		return (hour - 7 + 12) % 24 - 12 
+	return (hour - 11 + 12) % 24 -12
 
-#def predict_from_logproba(sequence, log_proba):
+def display_side_by_side(*args):
+	# Answer 2 of stack overflow question
+	# https://stackoverflow.com/questions/38783027/jupyter-notebook-display-two-pandas-tables-side-by-side
+	#
+    html_str=''
+    for df in args:
+        html_str+=df.to_html()
+    display_html(html_str.replace('table','table style="display:inline"'),raw=True)
+
+def format_results(results_np_array, tracker_np_array, column_info, index_info='request length'):
+	#
+	# Assumes max request length = 3 and top 1 to 5 is calculated
+	#
+	all_results = results_np_array * np.mean(tracker_np_array, axis=0)
+	all_results = np.sum(all_results, axis=1)
+	all_results = all_results.reshape((1,-1))
+	all_results = all_results[:,[0,2,4]]
+	top_1_3_5 = results_np_array[[0,2,4],:].T
+	results_array = np.vstack((top_1_3_5,all_results))
+	results_df = pd.DataFrame(results_array,index=['0','1','2','3+','ALL'], columns=['top 1', 'top 3', 'top 5'])
+	results_df.index.name = index_info
+	results_df.columns.name = column_info
+	return results_df
+
 
 
 

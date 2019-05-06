@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 import helpers
 
 class SessionSet:
+	"""
+	Class that stores the sessions dataframe and adds useful functions
+	to interprete the data.
+	"""
 	def __init__(self, dataframe, country, epsilon=1e-5):
 		self.df = dataframe
 		self.country = country

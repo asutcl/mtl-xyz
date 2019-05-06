@@ -17,8 +17,14 @@ def compute_generalization_error_estimate(
 	aggregation=None,
 	epsilon=1e-5,
 	verbose=1,
-	train_lr=False
+	train_lr=False,
+	check_history=False
 ):
+	"""
+	Function to compute the generalization error of the Bayesian Model through crossvalidation.
+	It can be parametrized to aggregagate data, use a prior based on logistic regression
+	and check for previous sessions of the same user. 
+	"""
 	splitter = RepeatedStratifiedKFold(n_splits=folds, n_repeats=repeats)
 	model = BayesianModel(epsilon, ignore_coocurrences, aggregation)
 	cities = session_set.get_list_of_cities()
@@ -58,10 +64,15 @@ def compute_generalization_error_estimate(
 			target = test[0][targetIndex]
 			query = [c for i,c in enumerate(test[0]) if i != targetIndex]
 			query_length = min(len(query), max_request_size_for_stats)
+			if check_history :
+				history_query = set()
+				[history_query.update(x) for x in train_set.loc[train_set['user.user_id'] == 2853]['cities'].values]
+				history_query.update(query)
+				query = list(history_query)
 			if train_lr:
-				ranked_cities = model._predict(query, lr_prior.predict(test))
+				ranked_cities = model._predict(query, lr_prior.predict(test), check_history)
 			else:
-				ranked_cities = model._predict(query)
+				ranked_cities = model._predict(query, check_history)
 			test_tracker[results_row_counter, 0 , query_length] += 1
 			for j in range(top_x_cities):
 				if target in ranked_cities[:j+1]:

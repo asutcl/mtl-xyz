@@ -7,11 +7,21 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import fbeta_score, make_scorer
 
 class DummyModel:
+	"""
+	This model always return equal probability between two classes.
+	It can not and should not be fitted.
+	"""
 
 	def predict_proba(self, *args):
 		return np.array([[0.5, 0.5]])
 
 class LogisticPrior:
+	"""
+	Model to compute a one vs all logistic regression for each canditate target (citie).
+	Should be passed the df from which to pick the columns as well as columns to consider and the list
+	of target cities it should fit models for. If a city is not present in the training set when fitting,
+	the model will use the Dummy Model which returns 0.5 probability. 
+	"""
 
 	def __init__(self, df, columns, targets,epsilon=1e-5):
 		self.epsilon = 1e-5

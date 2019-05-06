@@ -3,6 +3,11 @@ import numpy as np
 from SessionSet import SessionSet
 
 class BayesianModel:
+	"""
+	Main model uses Bayes Theorem to compute the likelihood of
+	querying a city best on a request of size 0...n.
+	Must be fit with sample sessions before callign predict.s
+	"""
 
 	def __init__(self, epsilon=1e-5, ignore_coocurrences=False, aggregation=None):
 		self.epsilon = epsilon
@@ -56,7 +61,7 @@ class BayesianModel:
 			return self._predict(input_to_predict, custom_prior)
 
 	def compute_logproba_cooccurence_matrix(self, cities, df):
-		#NOTE assumes the same city is not queried twice in a session
+		#NOTE: assumes the same city is not queried twice in a session
 		train_df = df
 		if self.aggregation:
 			aggregate = ['cities'] + self.aggregation

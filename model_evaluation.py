@@ -6,6 +6,8 @@ from SessionSet import SessionSet
 from BayesianModel import BayesianModel
 from LogisticPrior import LogisticPrior
 
+USER_ID_INDEX = 6
+
 def compute_generalization_error_estimate(
 	session_set,
 	folds=3,
@@ -66,13 +68,13 @@ def compute_generalization_error_estimate(
 			query_length = min(len(query), max_request_size_for_stats)
 			if check_history :
 				history_query = set()
-				[history_query.update(x) for x in train_set.loc[train_set['user.user_id'] == 2853]['cities'].values]
+				[history_query.update(x) for x in train_set.loc[train_set['user.user_id'] == test[USER_ID_INDEX]]['cities'].values]
 				history_query.update(query)
 				query = list(history_query)
 			if train_lr:
-				ranked_cities = model._predict(query, lr_prior.predict(test), check_history)
+				ranked_cities = model._predict(query, lr_prior.predict(test))
 			else:
-				ranked_cities = model._predict(query, check_history)
+				ranked_cities = model._predict(query)
 			test_tracker[results_row_counter, 0 , query_length] += 1
 			for j in range(top_x_cities):
 				if target in ranked_cities[:j+1]:

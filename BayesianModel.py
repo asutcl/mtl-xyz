@@ -29,7 +29,8 @@ class BayesianModel:
 		else:
 			ll = np.zeros((1,len(self._i_c_m)))
 			for city in query_sequence:
-			    ll += self._fit_data.loc[city].values
+				if city in self._c_i_m.keys():
+					ll += self._fit_data.loc[city].values
 			ll += max(len(query_sequence),1) * prior
 		ll = ll * -1
 		ordered_city = list(map(self._get_city_for_index, np.argsort(ll.flatten())))

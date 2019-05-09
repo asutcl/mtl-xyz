@@ -79,8 +79,9 @@ class BayesianModel:
 			cities_unique = list(set(session_cities))
 			for i in range(len(cities_unique)):
 				X_total_counts[0,city_index_mapping[cities_unique[i]]] += 1.0
-				for j in range(i,len(cities_unique)):
-					X_cooccurence_counts[city_index_mapping[cities_unique[i]],city_index_mapping[cities_unique[j]]] += 1.0
+				for j in range(len(cities_unique)):
+					if (i != j):
+						X_cooccurence_counts[city_index_mapping[cities_unique[i]],city_index_mapping[cities_unique[j]]] += 1.0
 		X_total_counts[X_total_counts == 0] = 1 # avoid dividing by 0
 		X_cooccurence_probs = np.log(X_cooccurence_counts / X_total_counts) 
 		for i in range(city_count):
